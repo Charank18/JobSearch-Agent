@@ -1,0 +1,45 @@
+scraper:
+  browser: chromium
+  headless: true
+  anonymize: true
+  login: true
+  max_jobs_per_search: 15
+  max_pages: 5
+  delay_between_requests:
+    min: 2.0
+    max: 5.0
+  retry:
+    max_attempts: 3
+    backoff_factor: 2.0
+
+search:
+  default_locations:
+    - "Bangalore, India"
+    - "Hyderabad, India"
+    - "Mumbai, India"
+    - "Delhi, India"
+    - "Pune, India"
+    - "Chennai, India"
+    - "India"
+  queries:
+    - "Software Engineer"
+    - "Software Developer"
+    - "Python Developer"
+    - "Full Stack Developer"
+    - "Backend Developer"
+    - "Machine Learning Engineer"
+    - "Data Scientist"
+    - "Data Engineer"
+  experience_levels:
+    - "entry_level"
+    - "associate"
+    - "internship"
+  date_posted: "past_week"
+
+output:
+  linkedin_dir: "output/linkedin"
+  cvs_dir: "output/cvs"
+  cover_letters_dir: "output/cover_letters"
+  parsed_jobs_dir: "output/parsed_jobs"
+  database: "jobs/jobs.db"
+  logs_dir: "logs"

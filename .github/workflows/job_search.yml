@@ -1,0 +1,113 @@
+name: Automated Job Search
+
+on:
+  schedule:
+    # Runs 3 times daily: 6 AM, 2 PM, 10 PM IST (12:30 AM, 8:30 AM, 4:30 PM UTC)
+    - cron: '30 0 * * *'
+    - cron: '30 8 * * *'
+    - cron: '30 16 * * *'
+  workflow_dispatch:
+    inputs:
+      query:
+        description: 'Job search query'
+        required: false
+        default: 'Software Engineer'
+      location:
+        description: 'Job location'
+        required: false
+        default: 'India'
+      max_jobs:
+        description: 'Maximum jobs to scrape'
+        required: false
+        default: '10'
+
+permissions:
+  contents: write
+
+jobs:
+  search-jobs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium
+          playwright install-deps chromium
+
+      - name: Create .env file
+        run: |
+          echo "LINKEDIN_USERNAME=${{ secrets.LINKEDIN_USERNAME }}" > .env
+          echo "LINKEDIN_PASSWORD=${{ secrets.LINKEDIN_PASSWORD }}" >> .env
+          echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> .env
+
+      - name: Run job search - Software Engineer
+        run: |
+          python main.py search "Software Engineer" \
+            -l "Bangalore, India" -l "Hyderabad, India" -l "India" \
+            -m 10 --generate-cv --generate-cover-letter --headless \
+            --date-posted past_week
+        continue-on-error: true
+
+      - name: Run job search - Python Developer
+        run: |
+          python main.py search "Python Developer" \
+            -l "Bangalore, India" -l "Mumbai, India" -l "India" \
+            -m 10 --generate-cv --generate-cover-letter --headless \
+            --date-posted past_week
+        continue-on-error: true
+
+      - name: Run job search - Full Stack Developer
+        run: |
+          python main.py search "Full Stack Developer" \
+            -l "Pune, India" -l "Delhi, India" -l "India" \
+            -m 10 --generate-cv --generate-cover-letter --headless \
+            --date-posted past_week
+        continue-on-error: true
+
+      - name: Run job search - ML Engineer
+        run: |
+          python main.py search "Machine Learning Engineer" \
+            -l "Bangalore, India" -l "India" \
+            -m 8 --generate-cv --generate-cover-letter --headless \
+            --date-posted past_week
+        continue-on-error: true
+
+      - name: Run custom search (manual trigger)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          python main.py search "${{ github.event.inputs.query }}" \
+            -l "${{ github.event.inputs.location }}" \
+            -m ${{ github.event.inputs.max_jobs }} \
+            --generate-cv --generate-cover-letter --headless
+        continue-on-error: true
+
+      - name: Upload job results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: job-results-${{ github.run_number }}
+          path: |
+            output/
+            jobs/
+            logs/
+          retention-days: 30
+
+      - name: Commit results to repo
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f jobs/*.json output/linkedin/*.json logs/*.log 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "chore: automated job search results $(date +%Y-%m-%d_%H:%M)"
+          git push || true

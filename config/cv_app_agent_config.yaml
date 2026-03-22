@@ -1,0 +1,18 @@
+ai:
+  provider: "google"
+  model: "gemini-2.0-flash"
+  temperature: 0.7
+  max_output_tokens: 4096
+
+cv_generation:
+  enabled: true
+  format: "text"
+
+cover_letter:
+  enabled: true
+  max_words: 400
+
+job_parsing:
+  enabled: true
+  extract_skills: true
+  extract_salary: true

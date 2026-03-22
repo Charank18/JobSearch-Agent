@@ -1,0 +1,69 @@
+{
+  "name": "Charan Karnati",
+  "github": "Charank18",
+  "linkedin": "charankarnati",
+  "email": "charankarnati180604@gmail.com",
+  "google_scholar": true,
+  "summary": "Software engineer with experience building ML-driven supply chain systems, including forecasting models, MIP-based replenishment engines, and real-time inventory optimization. Proficient in Python, C++, Java, and TypeScript with production experience across full-stack development, operations research, and LLM-powered applications.",
+  "education": {
+    "institution": "National Institute of Technology (NIT), Andhra Pradesh",
+    "degree": "B.Tech - Computer Science & Engineering, summa cum laude",
+    "cgpa": "9.07"
+  },
+  "experience": [
+    {
+      "company": "Myntra (Flipkart)",
+      "role": "Software Developer Intern - Supply Chain Management",
+      "period": "Jan 2026 - Present",
+      "highlights": [
+        "Built a Probability Sell-Through Model predicting granular level sell-through quantities over a 3-day rolling period; improved forecast accuracy by 18%",
+        "Designed time-series forecasting pipelines (LightGBM, XGBoost) for dark store inventory planning; reduced OOS incidents by 10%",
+        "Engineered a MIP-based replenishment engine using Google OR-Tools (SCIP solver)",
+        "Optimized allocation algorithms improving GMV per cluster by 8%",
+        "Owned end-to-end supply chain ML pipeline processing 100K+ daily order signals"
+      ]
+    },
+    {
+      "company": "Annam.AI",
+      "role": "Software Engineer Intern",
+      "period": "May 2025 - Dec 2025",
+      "highlights": [
+        "Architected full-stack generative AI pipeline (Express, TypeScript, InversifyJS) serving 100+ beta users",
+        "Automated course-item creation reducing manual curation time by 65%",
+        "Integrated JWT-based auth and role-based access control"
+      ]
+    },
+    {
+      "company": "AIISC, University of South Carolina",
+      "role": "Student Researcher (Remote)",
+      "period": "Feb 2025 - May 2025",
+      "highlights": [
+        "Engineered multi-agent simulation with LLM-driven agents in geospatially accurate NYC environment",
+        "Built interactive real-time visualization dashboard using Mapbox GL JS"
+      ]
+    }
+  ],
+  "publications": [
+    {
+      "title": "Meta-Heuristic Algorithms for the Quasi Total Double Roman Domination Problem",
+      "venue": "RAIRO: ITA (H-index 39)",
+      "role": "First Author"
+    },
+    {
+      "title": "Quantum Key Distribution Protocols: Evolution, Types, and Applications",
+      "venue": "16th IEEE ICCCNT",
+      "role": "First Author"
+    },
+    {
+      "title": "Quantum Approaches to NP-Hard Combinatorial Optimization Problems",
+      "venue": "MCCS-2025",
+      "role": "First Author"
+    }
+  ],
+  "skills": {
+    "languages": ["Python", "C++", "Java", "JavaScript", "TypeScript", "SQL"],
+    "frameworks": ["React", "Node.js", "Express", "Django", "FastAPI", "LangChain", "Google OR-Tools"],
+    "ml_ai": ["PyTorch", "TensorFlow", "scikit-learn", "LightGBM", "HuggingFace Transformers", "SpaCy", "NLTK", "Pandas", "NumPy"],
+    "infrastructure": ["Git", "Docker", "Linux", "REST APIs", "CI/CD", "AWS/GCP"]
+  }
+}

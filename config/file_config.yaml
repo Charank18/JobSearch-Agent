@@ -1,0 +1,10 @@
+paths:
+  resume_data: "data/resume.json"
+  templates_dir: "data/templates"
+  output_base: "output"
+  database: "jobs/jobs.db"
+  logs: "logs"
+
+templates:
+  cv: "data/templates/cv_template.txt"
+  cover_letter: "data/templates/cover_letter_template.txt"

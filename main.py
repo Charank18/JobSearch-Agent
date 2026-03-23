@@ -19,6 +19,7 @@ console = Console()
 @click.group()
 def cli():
     """JobSearch Agent - Intelligent job search automation."""
+    ensure_output_dirs()
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s %(levelname)s %(message)s",
@@ -27,7 +28,6 @@ def cli():
             logging.FileHandler("logs/jobsearch.log", mode="a"),
         ],
     )
-    ensure_output_dirs()
 
 
 @cli.command()

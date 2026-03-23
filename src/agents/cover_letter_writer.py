@@ -6,8 +6,8 @@ import logging
 import os
 from datetime import datetime
 
-import google.generativeai as genai
 from dotenv import load_dotenv
+from google import genai
 
 from src.prompts.prompts import RESUME_DATA, COVER_LETTER_PROMPT
 from src.utils.file_utils import save_text
@@ -21,8 +21,8 @@ class CoverLetterWriter:
         api_key = os.getenv("GOOGLE_API_KEY")
         if not api_key:
             raise ValueError("GOOGLE_API_KEY not set")
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel(model_name)
+        self.client = genai.Client(api_key=api_key)
+        self.model_name = model_name
 
     def generate_cover_letter(self, job: dict) -> str:
         skills_flat = []
@@ -40,7 +40,9 @@ class CoverLetterWriter:
             job_description=job.get("description", "")[:2000],
         )
         try:
-            response = self.model.generate_content(prompt)
+            response = self.client.models.generate_content(
+                model=self.model_name, contents=prompt
+            )
             return response.text
         except Exception as e:
             logger.error(f"Cover letter generation failed: {e}")

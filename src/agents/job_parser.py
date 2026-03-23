@@ -7,8 +7,8 @@ import logging
 import os
 from datetime import datetime
 
-import google.generativeai as genai
 from dotenv import load_dotenv
+from google import genai
 
 from src.prompts.prompts import JOB_PARSER_PROMPT
 from src.utils.file_utils import save_json
@@ -22,13 +22,15 @@ class JobParser:
         api_key = os.getenv("GOOGLE_API_KEY")
         if not api_key:
             raise ValueError("GOOGLE_API_KEY not set")
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel(model_name)
+        self.client = genai.Client(api_key=api_key)
+        self.model_name = model_name
 
     def parse_job(self, job_text: str) -> dict:
         prompt = JOB_PARSER_PROMPT.format(job_text=job_text[:4000])
         try:
-            response = self.model.generate_content(prompt)
+            response = self.client.models.generate_content(
+                model=self.model_name, contents=prompt
+            )
             text = response.text.strip()
             if text.startswith("```"):
                 text = text.split("```")[1]

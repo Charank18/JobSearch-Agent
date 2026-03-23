@@ -2,14 +2,12 @@
 AI-powered CV generation agent using Google Gemini.
 """
 
-import json
 import logging
 import os
 from datetime import datetime
-from pathlib import Path
 
-import google.generativeai as genai
 from dotenv import load_dotenv
+from google import genai
 
 from src.prompts.prompts import RESUME_DATA, CV_GENERATION_PROMPT
 from src.utils.file_utils import save_text
@@ -23,8 +21,8 @@ class CVWriter:
         api_key = os.getenv("GOOGLE_API_KEY")
         if not api_key:
             raise ValueError("GOOGLE_API_KEY not set")
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel(model_name)
+        self.client = genai.Client(api_key=api_key)
+        self.model_name = model_name
 
     def _format_experience(self) -> str:
         lines = []
@@ -58,7 +56,9 @@ class CVWriter:
             job_description=job.get("description", "")[:3000],
         )
         try:
-            response = self.model.generate_content(prompt)
+            response = self.client.models.generate_content(
+                model=self.model_name, contents=prompt
+            )
             return response.text
         except Exception as e:
             logger.error(f"CV generation failed: {e}")

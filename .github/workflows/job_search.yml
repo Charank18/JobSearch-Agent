@@ -1,4 +1,4 @@
-name: Automated Job Search
+name: Automated Job Search & Apply
 
 on:
   schedule:
@@ -25,9 +25,9 @@ permissions:
   contents: write
 
 jobs:
-  search-jobs:
+  search-and-apply:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: Checkout repository
@@ -51,35 +51,39 @@ jobs:
           echo "LINKEDIN_PASSWORD=${{ secrets.LINKEDIN_PASSWORD }}" >> .env
           echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> .env
 
-      - name: Run job search - Software Engineer
+      - name: Search & Apply - Software Engineer
         run: |
           python main.py search "Software Engineer" \
             -l "Bangalore, India" -l "Hyderabad, India" -l "India" \
-            -m 10 --generate-cv --generate-cover-letter --headless \
+            -m 10 --auto-apply --max-apply 15 \
+            --generate-cv --generate-cover-letter --headless \
             --date-posted past_week
         continue-on-error: true
 
-      - name: Run job search - Python Developer
+      - name: Search & Apply - Python Developer
         run: |
           python main.py search "Python Developer" \
             -l "Bangalore, India" -l "Mumbai, India" -l "India" \
-            -m 10 --generate-cv --generate-cover-letter --headless \
+            -m 10 --auto-apply --max-apply 15 \
+            --generate-cv --generate-cover-letter --headless \
             --date-posted past_week
         continue-on-error: true
 
-      - name: Run job search - Full Stack Developer
+      - name: Search & Apply - Full Stack Developer
         run: |
           python main.py search "Full Stack Developer" \
             -l "Pune, India" -l "Delhi, India" -l "India" \
-            -m 10 --generate-cv --generate-cover-letter --headless \
+            -m 10 --auto-apply --max-apply 15 \
+            --generate-cv --generate-cover-letter --headless \
             --date-posted past_week
         continue-on-error: true
 
-      - name: Run job search - ML Engineer
+      - name: Search & Apply - ML Engineer
         run: |
           python main.py search "Machine Learning Engineer" \
             -l "Bangalore, India" -l "India" \
-            -m 8 --generate-cv --generate-cover-letter --headless \
+            -m 8 --auto-apply --max-apply 10 \
+            --generate-cv --generate-cover-letter --headless \
             --date-posted past_week
         continue-on-error: true
 
@@ -89,7 +93,13 @@ jobs:
           python main.py search "${{ github.event.inputs.query }}" \
             -l "${{ github.event.inputs.location }}" \
             -m ${{ github.event.inputs.max_jobs }} \
+            --auto-apply --max-apply 20 \
             --generate-cv --generate-cover-letter --headless
+        continue-on-error: true
+
+      - name: Show applied jobs summary
+        if: always()
+        run: python main.py applied || true
         continue-on-error: true
 
       - name: Upload job results
@@ -109,5 +119,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -f jobs/*.json output/linkedin/*.json logs/*.log 2>/dev/null || true
-          git diff --cached --quiet || git commit -m "chore: automated job search results $(date +%Y-%m-%d_%H:%M)"
+          git diff --cached --quiet || git commit -m "chore: job search + auto-apply results $(date +%Y-%m-%d_%H:%M)"
           git push || true

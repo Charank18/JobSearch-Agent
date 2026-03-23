@@ -38,10 +38,15 @@ def _ensure_tables(conn: sqlite3.Connection):
             processed INTEGER DEFAULT 0,
             cv_generated INTEGER DEFAULT 0,
             cover_letter_generated INTEGER DEFAULT 0,
+            applied INTEGER DEFAULT 0,
+            apply_method TEXT,
+            apply_error TEXT,
+            applied_at TEXT,
             created_at TEXT DEFAULT (datetime('now'))
         );
         CREATE INDEX IF NOT EXISTS idx_jobs_url ON jobs(url);
         CREATE INDEX IF NOT EXISTS idx_jobs_processed ON jobs(processed);
+        CREATE INDEX IF NOT EXISTS idx_jobs_applied ON jobs(applied);
     """)
 
 
@@ -91,6 +96,31 @@ def mark_processed(conn: sqlite3.Connection, job_id: int, cv: bool = False, cove
         (int(cv), int(cover), job_id),
     )
     conn.commit()
+
+
+def get_unapplied_jobs(conn: sqlite3.Connection, limit: int = 50) -> list[dict]:
+    rows = conn.execute(
+        "SELECT * FROM jobs WHERE applied = 0 AND url != '' ORDER BY created_at DESC LIMIT ?",
+        (limit,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def mark_applied(conn: sqlite3.Connection, job_id: int, method: str = "easy_apply",
+                 error: Optional[str] = None, applied_at: Optional[str] = None):
+    conn.execute(
+        """UPDATE jobs SET applied = ?, apply_method = ?, apply_error = ?, applied_at = ?
+        WHERE id = ?""",
+        (1 if not error else -1, method, error, applied_at or datetime.now().isoformat(), job_id),
+    )
+    conn.commit()
+
+
+def get_applied_jobs(conn: sqlite3.Connection) -> list[dict]:
+    rows = conn.execute(
+        "SELECT * FROM jobs WHERE applied = 1 ORDER BY applied_at DESC"
+    ).fetchall()
+    return [dict(r) for r in rows]
 
 
 def get_all_jobs(conn: sqlite3.Connection) -> list[dict]:

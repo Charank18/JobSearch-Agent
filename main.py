@@ -36,6 +36,8 @@ def cli():
 @click.option("--max-jobs", "-m", default=10, help="Max jobs to scrape")
 @click.option("--generate-cv", is_flag=True, help="Generate tailored CVs")
 @click.option("--generate-cover-letter", is_flag=True, help="Generate cover letters")
+@click.option("--auto-apply", is_flag=True, help="Auto-apply via Easy Apply")
+@click.option("--max-apply", default=30, help="Max jobs to apply to per run")
 @click.option("--no-parse", is_flag=True, help="Skip job parsing")
 @click.option("--browser", default="chromium", type=click.Choice(["chromium", "firefox", "webkit"]))
 @click.option("--headless/--no-headless", default=True)
@@ -44,11 +46,15 @@ def cli():
 @click.option("--date-posted", default="any_time",
               type=click.Choice(["any_time", "past_month", "past_week", "past_24h"]))
 def search(query, locations, max_jobs, generate_cv, generate_cover_letter,
-           no_parse, browser, headless, no_login, experience_levels, date_posted):
-    """Search for jobs and optionally generate documents."""
+           auto_apply, max_apply, no_parse, browser, headless, no_login,
+           experience_levels, date_posted):
+    """Search for jobs, generate documents, and optionally auto-apply."""
     console.print(f"\n[bold green]Searching for:[/] {query}")
     console.print(f"[bold]Locations:[/] {', '.join(locations)}")
-    console.print(f"[bold]Max jobs:[/] {max_jobs}\n")
+    console.print(f"[bold]Max jobs:[/] {max_jobs}")
+    if auto_apply:
+        console.print(f"[bold yellow]Auto-apply:[/] ENABLED (max {max_apply})")
+    console.print()
 
     result = run_job_search(
         query=query,
@@ -57,6 +63,8 @@ def search(query, locations, max_jobs, generate_cv, generate_cover_letter,
         generate_cv=generate_cv,
         generate_cover_letter=generate_cover_letter,
         parse_jobs=not no_parse,
+        auto_apply=auto_apply,
+        max_apply=max_apply,
         browser=browser,
         headless=headless,
         login=not no_login,
@@ -102,6 +110,38 @@ def process(filepath, generate_cv, generate_cover_letter):
             cl_writer.generate_and_save(job)
 
     console.print(f"\n[bold green]Done![/] Processed {len(jobs)} jobs")
+
+
+@cli.command()
+def applied():
+    """Show all jobs that were successfully applied to."""
+    from src.utils.job_database import get_connection, get_applied_jobs
+
+    conn = get_connection()
+    jobs = get_applied_jobs(conn)
+    conn.close()
+
+    if not jobs:
+        console.print("[yellow]No applications yet.[/]")
+        return
+
+    table = Table(title=f"Applied Jobs ({len(jobs)} total)")
+    table.add_column("#", style="dim")
+    table.add_column("Company", style="cyan")
+    table.add_column("Title", style="green")
+    table.add_column("Location")
+    table.add_column("Applied At", style="dim")
+
+    for i, j in enumerate(jobs, 1):
+        table.add_row(
+            str(i),
+            (j.get("company") or "N/A")[:30],
+            (j.get("title") or "N/A")[:35],
+            (j.get("location") or "")[:25],
+            (j.get("applied_at") or "")[:19],
+        )
+
+    console.print(table)
 
 
 if __name__ == "__main__":

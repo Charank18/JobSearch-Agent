@@ -24,27 +24,53 @@ from src.utils.file_utils import ensure_output_dirs, save_json
 
 logger = logging.getLogger(__name__)
 
-IRRELEVANT_TITLE_KEYWORDS = [
-    "director", "principal", "staff", "lead", "manager", "head of",
-    "vp ", "vice president", "chief", "architect",
+SENIOR_TITLE_KEYWORDS = [
+    "senior", "sr.", "sr ", "lead", "principal", "staff", "director",
+    "manager", "head of", "vp ", "vice president", "chief", "architect",
+    "expert", "specialist", "consultant", "advisor", "executive",
+]
+
+EXPERIENCE_KEYWORDS = [
+    "5+ years", "5 years", "6+ years", "7+ years", "8+ years", "10+ years",
+    "years of experience", "experienced", "proven track record",
 ]
 
 
 def is_relevant_job(job: dict) -> bool:
-    """Filter out senior/irrelevant roles before applying."""
+    """Filter to keep ONLY junior/entry-level positions with no experience required."""
     title = (job.get("title") or "").lower()
-    for kw in IRRELEVANT_TITLE_KEYWORDS:
+    
+    # Reject senior titles
+    for kw in SENIOR_TITLE_KEYWORDS:
         if kw in title:
             return False
+    
+    # Check seniority level in criteria
     criteria = job.get("criteria") or ""
     if isinstance(criteria, str):
         try:
             criteria = json.loads(criteria)
         except (json.JSONDecodeError, TypeError):
             criteria = {}
+    
     seniority = (criteria.get("Seniority level") or "").lower()
-    if seniority in ("director", "executive", "vp"):
+    if seniority and seniority not in ("entry level", "internship", "associate", "not applicable", ""):
         return False
+    
+    # Check description for experience requirements
+    description = (job.get("description") or "").lower()
+    for kw in EXPERIENCE_KEYWORDS:
+        if kw in description:
+            return False
+    
+    # Accept if it's explicitly entry-level or has no clear experience requirement
+    if any(term in title for term in ["junior", "entry", "graduate", "fresher", "trainee", "intern"]):
+        return True
+    
+    if any(term in description for term in ["no experience", "0 years", "entry level", "fresh graduate", "new grad"]):
+        return True
+    
+    # If no senior keywords and no high experience requirements, accept it
     return True
 
 

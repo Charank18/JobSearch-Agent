@@ -53,8 +53,7 @@ jobs:
         run: |
           python main.py search "Entry Level" \
             -l "Bangalore, India" -l "Hyderabad, India" -l "India" \
-            -m 15 --auto-apply --max-apply 20 \
-            --generate-cv --generate-cover-letter --headless \
+            -m 15 --auto-apply --max-apply 20 --headless \
             -e "Entry level" -e "Internship" \
             --date-posted past_week
         continue-on-error: true
@@ -63,8 +62,7 @@ jobs:
         run: |
           python main.py search "Junior" \
             -l "Mumbai, India" -l "Pune, India" -l "India" \
-            -m 15 --auto-apply --max-apply 20 \
-            --generate-cv --generate-cover-letter --headless \
+            -m 15 --auto-apply --max-apply 20 --headless \
             -e "Entry level" \
             --date-posted past_week
         continue-on-error: true
@@ -73,8 +71,7 @@ jobs:
         run: |
           python main.py search "Graduate" \
             -l "Delhi, India" -l "Chennai, India" -l "India" \
-            -m 15 --auto-apply --max-apply 20 \
-            --generate-cv --generate-cover-letter --headless \
+            -m 15 --auto-apply --max-apply 20 --headless \
             -e "Entry level" \
             --date-posted past_week
         continue-on-error: true
@@ -83,8 +80,7 @@ jobs:
         run: |
           python main.py search "Fresher" \
             -l "Bangalore, India" -l "India" \
-            -m 15 --auto-apply --max-apply 20 \
-            --generate-cv --generate-cover-letter --headless \
+            -m 15 --auto-apply --max-apply 20 --headless \
             -e "Entry level" \
             --date-posted past_week
         continue-on-error: true
@@ -93,8 +89,7 @@ jobs:
         run: |
           python main.py search "Analyst" \
             -l "Hyderabad, India" -l "India" \
-            -m 12 --auto-apply --max-apply 15 \
-            --generate-cv --generate-cover-letter --headless \
+            -m 12 --auto-apply --max-apply 15 --headless \
             -e "Entry level" \
             --date-posted past_week
         continue-on-error: true
@@ -103,8 +98,7 @@ jobs:
         run: |
           python main.py search "Associate" \
             -l "Mumbai, India" -l "India" \
-            -m 12 --auto-apply --max-apply 15 \
-            --generate-cv --generate-cover-letter --headless \
+            -m 12 --auto-apply --max-apply 15 --headless \
             -e "Entry level" \
             --date-posted past_week
         continue-on-error: true
@@ -113,8 +107,7 @@ jobs:
         run: |
           python main.py search "Trainee" \
             -l "Pune, India" -l "India" \
-            -m 10 --auto-apply --max-apply 15 \
-            --generate-cv --generate-cover-letter --headless \
+            -m 10 --auto-apply --max-apply 15 --headless \
             -e "Entry level" \
             --date-posted past_week
         continue-on-error: true
@@ -125,8 +118,7 @@ jobs:
           python main.py search "${{ github.event.inputs.query }}" \
             -l "${{ github.event.inputs.location }}" \
             -m ${{ github.event.inputs.max_jobs }} \
-            --auto-apply --max-apply 25 \
-            --generate-cv --generate-cover-letter --headless \
+            --auto-apply --max-apply 25 --headless \
             -e "Entry level" -e "Internship"
         continue-on-error: true
 
@@ -138,6 +130,7 @@ jobs:
       - name: Upload job results
         uses: actions/upload-artifact@v4
         if: always()
+        continue-on-error: true
         with:
           name: job-results-${{ github.run_number }}
           path: |
